@@ -18,9 +18,9 @@ const userRegister = async (req, res) => {
       const passwordEncrypted = await bcrypt.hash(password, 10);
   
       await knex("usuarios").insert({
-        name,
+        nome : name,
         email,
-        password : passwordEncrypted,
+        senha : passwordEncrypted,
       });
   
       res.status(204).json();
@@ -50,7 +50,7 @@ const login = async (req, res) => {
         });
       };
   
-      let { password : passwordUser, ...UserNoPassword } = user;
+      let { senha : passwordUser, ...UserNoPassword } = user;
   
       const token = sign(
         {
@@ -63,14 +63,13 @@ const login = async (req, res) => {
       );
   
       return res.status(200).json({
-        mensagem: user,
+        mensagem: UserNoPassword,
         token,
       });
 
     } catch (error) {
-      return res.status(500).json({
-        mensagem: error.message,
-      });
+      console.log(error)
+      return res.status(500).json({ mensagem: error.message});
     }
 };
 
@@ -91,7 +90,7 @@ const updateUser = async (req, res) => {
       const passwordEncrypted = await bcrypt.hash(`${password}`, 10);
 
       await knex("usuarios").where({ id }).update({
-        name,
+        nome : name,
         email,
         senha: passwordEncrypted,
       });

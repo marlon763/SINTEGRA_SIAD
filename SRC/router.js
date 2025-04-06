@@ -7,9 +7,17 @@ const {
     updateUser
 } = require("./CONTROLLER/userController");
 
+const {
+    registerEnterprise,
+    updateEnterprise,
+    registerEmail,
+    deleteEmail
+} = require("./CONTROLLER/enterpriseController");
+
 const loginSchema = require("./SCHEMA/userLoginSchema");
-const userSchema = require("./SCHEMA/userSchema")
- 
+const userSchema = require("./SCHEMA/userSchema");
+const { EnterpriseSchema , EmailSchema } = require("./SCHEMA/enterpriseSchema");
+
 const { authenticateLoggedInUser } = require("./INTERMEDIARIES/loggedUser");
 const validateRequestBody = require("./INTERMEDIARIES/validateRequestBody");
 
@@ -17,10 +25,14 @@ const validateRequestBody = require("./INTERMEDIARIES/validateRequestBody");
 routers.post("/usuario",  validateRequestBody (userSchema), userRegister);
 routers.post("/login",  validateRequestBody (loginSchema), login);
 
-
 //VERIFICADOR DE USUARIO LOGADO
 routers.use(authenticateLoggedInUser);
 
 routers.put("/usuario",  validateRequestBody (userSchema), updateUser);
+
+routers.post("/empresa", validateRequestBody(EnterpriseSchema) , registerEnterprise);
+routers.put("/empresa/:id_empresa", validateRequestBody(EnterpriseSchema) , updateEnterprise);
+routers.post("/empresa/email/:id_empresa", validateRequestBody(EmailSchema) , registerEmail);
+routers.delete("/emails/:id_empresa/:email", validateRequestBody(EmailSchema) , deleteEmail);
 
 module.exports = routers
