@@ -51,21 +51,21 @@
 </head>
 <body>
   <div class="container">
-    <h2 style="text-align: center;">Relatório SINTEGRA - [EMPRESA]</h2>
+    <h2 style="text-align: center;">Relatório SINTEGRA - {{nome_empresa}}</h2>
 
     <p>Prezados,</p>
 
-    <p>Segue em anexo o relatório SINTEGRA referente ao período de <strong>[PERÍODO]</strong> da empresa <strong>[RAZÃO SOCIAL]</strong> (CNPJ: <strong>[CNPJ]</strong>).</p>
+    <p>Segue em anexo o relatório SINTEGRA referente ao período de <strong>[PERÍODO]</strong> da empresa <strong>{{nome_empresa}}</strong> CNPJ: <strong>{{cnpj}}</strong>.</p>
 
     <div class="info">
-      <p><strong>Data de geração:</strong> [DATA_GERACAO]</p>
-      <p><strong>Responsável:</strong> [NOME_USUARIO]</p>
+      <p><strong>Data de geração:</strong> {{data_geracao}}</p>
+      <p><strong>Responsável:</strong> {{responsavel}}</p>
     </div>
 
     <p>Em caso de dúvidas ou divergências, favor entrar em contato com o setor responsável.</p>
 
     <div style="text-align: center;">
-    <a href="[LINK_DOWNLOAD_RELATORIO]" class="button">Baixar Relatório</a>
+    <a href="{{link}}" class="button">Baixar Relatório</a>
     </div>
 
     <div class="footer">

@@ -3,6 +3,7 @@ const knex = require("../DATA/connection");
 const registerEnterprise = async (req, res) => {
   try {
     const { nome_empresa , cnpj , emails } = req.body;
+    const { id } = req.user
 
     const enterpriseExisting = await knex("empresas").where({ cnpj }).first();
 
@@ -10,7 +11,7 @@ const registerEnterprise = async (req, res) => {
       return res.status(400).json({ mensagem: "Empresa já cadastrada com esse CNPJ." });
     }
 
-    const newEnterprise = await knex("empresas").insert({ nome_empresa, cnpj }).returning("*");
+    const newEnterprise = await knex("empresas").insert({ nome_empresa, cnpj , rel_usuario :id }).returning("*");
 
     // Se vierem e-mails no body, insere na tabela de emails
     if (Array.isArray(emails) && emails.length > 0) {

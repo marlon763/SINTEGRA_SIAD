@@ -10,7 +10,8 @@ senha varchar (150) not null
 CREATE TABLE IF NOT EXISTS empresas (
 id SERIAL PRIMARY KEY,
 nome_empresa varchar (50) NOT NULL,
-cnpj varchar(14) NOT NULL
+cnpj varchar(14) NOT NULL,
+rel_usuario INTEGER NOT NULL REFERENCES usuarios(id)
 );
 
 CREATE TABLE IF NOT EXISTS emails (

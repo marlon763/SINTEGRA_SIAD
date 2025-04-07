@@ -1,10 +1,12 @@
 const http = require("http");
 const express = require("express");
 const routers = require("./router");
+const cors = require('cors');
 
 const app = express();
 const server = http.createServer(app);
 
+app.use(cors())
 app.use(express.json());
 app.use(routers);
 

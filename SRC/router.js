@@ -1,3 +1,4 @@
+const multer = require('./SERVICES/multerConf');
 const { Router } = require("express");
 const routers = Router();
 
@@ -13,6 +14,10 @@ const {
     registerEmail,
     deleteEmail
 } = require("./CONTROLLER/enterpriseController");
+
+const {
+    sendSintegra
+} = require("./CONTROLLER/sendSintegraController")
 
 const loginSchema = require("./SCHEMA/userLoginSchema");
 const userSchema = require("./SCHEMA/userSchema");
@@ -34,5 +39,7 @@ routers.post("/empresa", validateRequestBody(EnterpriseSchema) , registerEnterpr
 routers.put("/empresa/:id_empresa", validateRequestBody(EnterpriseSchema) , updateEnterprise);
 routers.post("/empresa/email/:id_empresa", validateRequestBody(EmailSchema) , registerEmail);
 routers.delete("/emails/:id_empresa/:email", validateRequestBody(EmailSchema) , deleteEmail);
+
+routers.post("/teste/:id_empresa", multer.array("files") , sendSintegra);
 
 module.exports = routers
