@@ -7,8 +7,6 @@ const {
 } = require("../FUNCTIONS/functionsSintegra");
 const sendSintegraAws = require("../FUNCTIONS/functionsAwsSendSintegra");
 
-//const axios = require('axios');
-
 const sendSintegra = async (req,res) => {
 
     try {
@@ -58,10 +56,6 @@ const sendSintegra = async (req,res) => {
         movSintegra( userName , dataMov , cnpj_empresa , arquivo );
 
         return res.status(200).json({ mensagem : "Email enviado com sucesso!" })
-
-        //const resultadoAPI = axios.get('rota aqui', { params : {} })
-        
-        //console.log(resultadoAPI)
 
     } catch (error) {
         console.error(error)
