@@ -23,8 +23,11 @@ const loginSchema = require("./SCHEMA/userLoginSchema");
 const userSchema = require("./SCHEMA/userSchema");
 const { EnterpriseSchema , EmailSchema } = require("./SCHEMA/enterpriseSchema");
 
+
 const { authenticateLoggedInUser } = require("./INTERMEDIARIES/loggedUser");
 const validateRequestBody = require("./INTERMEDIARIES/validateRequestBody");
+const verifyMulterFiles  = require("./INTERMEDIARIES/verifyFilesReq");
+
 
 //CRIACAO DE ROTAS SEM NECESSIDADE DE LOGIN DO USUARIO
 routers.post("/usuario",  validateRequestBody (userSchema), userRegister);
@@ -40,6 +43,6 @@ routers.put("/empresa/:id_empresa", validateRequestBody(EnterpriseSchema) , upda
 routers.post("/empresa/email/:id_empresa", validateRequestBody(EmailSchema) , registerEmail);
 routers.delete("/emails/:id_empresa/:email", validateRequestBody(EmailSchema) , deleteEmail);
 
-routers.post("/teste/:id_empresa", multer.array("files") , sendSintegra);
+routers.post("/teste/:cnpj_empresa", multer.array("files"), verifyMulterFiles , sendSintegra);
 
 module.exports = routers

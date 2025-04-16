@@ -1,107 +1,67 @@
 const { sendEmail } = require("../UTILS/email");
-const knex = require("../DATA/connection");
-const { s3 } = require("../DATA/awsConfig")
+const { 
+    loadEmpresa, 
+    loadEmails, 
+    compressor,
+    movSintegra
+} = require("../FUNCTIONS/functionsSintegra");
+const sendSintegraAws = require("../FUNCTIONS/functionsAwsSendSintegra");
 
-const archiver = require('archiver');
-const stream = require('stream');
-
-async function loadEmpresa (id_empresa , id) {
-
-    const empresa = await knex("empresas").select("nome_empresa", "cnpj").where({ id : id_empresa , rel_usuario : id });
-
-    return empresa
-    
-};
-
-async function loadEmails( id_empresa ) {
-
-    const emails = await knex("emails").select("email").where({ rel_empresa : id_empresa });
-
-    return emails
-    
-};
-
-async function compressor(files) {
-    return new Promise((resolve, reject) => {
-        const zipStream = new stream.PassThrough();
-        const archive = archiver('zip', { zlib: { level: 9 } });
-
-        const chunks = [];
-
-        zipStream.on('data', (chunk) => {
-            chunks.push(chunk);
-        });
-
-        zipStream.on('end', () => {
-            const buffer = Buffer.concat(chunks);
-            resolve(buffer); // Aqui está seu arquivo zip final
-        });
-
-        archive.on('error', (err) => {
-            reject(err);
-        });
-
-        archive.pipe(zipStream);
-
-        files.forEach(file => {
-            archive.append(file.buffer, { name: file.originalname });
-        });
-
-        archive.finalize();
-    });
-};
+//const axios = require('axios');
 
 const sendSintegra = async (req,res) => {
 
     try {
-        const { id_empresa } = req.params
+        const { cnpj_empresa } = req.params
         const { id , nome } = req.user;
         const files = req.files
 
-        const promisseAll = async (id_empresa , id) => {
+        if (!cnpj_empresa) {
+            return res.status(404).json({mensagem : "CNPJ da empresa não informado"})
+        };
+
+        const promisseAll = async (cnpj_empresa) => {
             const [empresa , email] = await Promise.all([
-                loadEmpresa( id_empresa , id ),
-                loadEmails( id_empresa )
+                loadEmpresa( cnpj_empresa ),
+                loadEmails( cnpj_empresa )
             ])
             
             return {empresa , email}
         };
 
-        const { empresa, email } = await promisseAll( id_empresa , id);
-
         let file = await compressor(files);
 
         const now = new Date();
         const mesAno = `${String(now.getMonth() + 1).padStart(2, '0')}-${now.getFullYear()}`;
+        const { empresa, email } = await promisseAll( cnpj_empresa , id);
 
-        const arquivo = await s3.upload({
-
-            Bucket: process.env.BACKBLAZE_BUCKET,
-            Key: `Sintegra/${mesAno}/${empresa[0].nome_empresa}.zip`,
-            Body: file,
-            ContentType: 'application/zip',
-            ContentDisposition: 'attachment'
+        const arquivo = await sendSintegraAws(empresa , file , mesAno);
         
-        }).promise();
-
         file = null;
+
+        const dataHora = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`;
 
         const context = {
             nome_empresa : empresa[0].nome_empresa,
             cnpj : empresa[0].cnpj,
-            data_geracao : new Date(),
+            data_geracao : dataHora,
             responsavel : nome,
             link : arquivo.Location,
             destinatarios : email
         };
 
         const htmlEmail = "./SRC/TAMPLETES/emailContabilSintegra.html";
+        const userName = nome
+        const dataMov = dataHora; 
 
-        sendEmail( htmlEmail , context)
+        sendEmail( htmlEmail , context );
+        movSintegra( userName , dataMov , cnpj_empresa , arquivo );
 
-        console.log("ok")
+        return res.status(200).json({ mensagem : "Email enviado com sucesso!" })
 
-        return res.status(200)
+        //const resultadoAPI = axios.get('rota aqui', { params : {} })
+        
+        //console.log(resultadoAPI)
 
     } catch (error) {
         console.error(error)
