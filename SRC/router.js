@@ -17,7 +17,18 @@ const {
 
 const {
     sendSintegra
-} = require("./CONTROLLER/sendSintegraController")
+} = require("./CONTROLLER/sendSintegraController");
+
+const {
+    initializeClient
+} = require("./VENOM/initVenom")
+
+const {
+    createVenom,
+    getCanais
+} = require("./VENOM/functionsVenom")
+
+const {handleTickets} = require("./CONTROLLER/tickets")
 
 const loginSchema = require("./SCHEMA/userLoginSchema");
 const userSchema = require("./SCHEMA/userSchema");
@@ -44,5 +55,12 @@ routers.post("/empresa/email/:id_empresa", validateRequestBody(EmailSchema) , re
 routers.delete("/emails/:id_empresa/:email", validateRequestBody(EmailSchema) , deleteEmail);
 
 routers.post("/teste/:cnpj_empresa", multer.array("files"), verifyMulterFiles , sendSintegra);
+
+routers.get("/canais" , getCanais)
+routers.post("/registrarcanais" , createVenom);
+
+routers.get("/atendimento/:id" , initializeClient);
+
+routers.get("/tickets",handleTickets)
 
 module.exports = routers
